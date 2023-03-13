@@ -14,6 +14,32 @@
 		<link rel="stylesheet" href="assets/css/main.css"/>
 		<link rel="preload" as="font">
 		<link rel="stylesheet" href="assets/fontawesome/all.min.css"/>
+
+		<link rel="manifest" href="manifest.json">
+	
+	<style>
+			#snackbar {
+			visibility: hidden;
+			min-width: 250px;
+			margin-left: -125px;
+			background-color: #333;
+			color: #fff;
+			text-align: center;
+			border-radius: 2px;
+			padding: 16px;
+			position: fixed;
+			z-index: 1;
+			left: 50%;
+			bottom: 30px;
+		  }
+	  
+		  #snackbar.show {
+			visibility: visible;
+			-webkit-animation: fadein 0.5s;
+			animation: fadein 0.5s;
+		  }
+	</style>
+
 	</head>
 	<body class="is-preload">
 	
@@ -44,13 +70,11 @@
 										</header>
 										<p>A cidade do Recife oferece vários destinos e atrações, dentre elas a gastronomia destaca-se. São inúmeras opções de restaurentes que servem comidas saborosas e ambientes agradáveis </p>
 									</div>
-									<span class="image object">
-										<img src="images/Caja9.avif
-										
-										
-										
-										" alt="mesa de resataurante com comidas e utensílios" />
-									</span>
+									<div>
+										<article>
+										<a href="#" class="image object"><img src="images/Caja9.avif" alt="mesa de resataurante com comidas e utensílios" /></a>
+										</article>
+									</div>
 								</section>
 
 
@@ -170,9 +194,9 @@
 										<h2>Entre em contato</h2>
 									</header>
 									<ul class="contact">
-										<li class="icon solid fa-envelope"><a href="#">conhecarecife@gmailcom</a></li>
-										<li class="icon solid fa-phone">(81) 4002-8922</li>
-										<li class="icon solid fa-location-dot">Av. Visconde de Suassuna, 500. Recife/PE.</li>
+										<li class="icon solid fa-envelope"><a href="mailto:conhecarecife@gmailcom">conhecarecife@gmailcom</a></li>
+										<li class="icon solid fa-phone"><a href="tel:+558140028922">(81) 4002-8922</a></li>
+										<li class="icon solid fa-location-dot"><a href="geo:-8.052396,-34.885028;u=35">Av. Visconde de Suassuna, 500. Recife/PE.</a></li>
 										
 									</ul>
 								</section>
@@ -188,11 +212,52 @@
 			</div>
 
 		<!-- Scripts -->
+
+		<div id="snackbar">Uma nova versão está disponível! Clique <a href="#" id="reload">AQUI</a> para atualizar.</div>
+
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/browser.min.js"></script>
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+
+			<script>
+				let newWorker;
+				function showUpdateBar() {
+				  let snackbar = document.getElementById('snackbar');
+				  snackbar.className = 'show';
+				}
+				// The click event on the pop up notification
+				document.getElementById('reload').addEventListener('click', function () {
+				  newWorker.postMessage({ action: 'skipWaiting' });
+				});
+				if ('serviceWorker' in navigator) {
+				  navigator.serviceWorker.register('/service-worker.js').then(reg => {
+					reg.addEventListener('updatefound', () => {
+					  // A wild service worker has appeared in reg.installing!
+					  newWorker = reg.installing;
+					  newWorker.addEventListener('statechange', () => {
+						// Has network.state changed?
+						switch (newWorker.state) {
+						  case 'installed':
+							if (navigator.serviceWorker.controller) {
+							  // new update available
+							  showUpdateBar();
+							}
+							// No update available
+							break;
+						}
+					  });
+					});
+				  });
+				  let refreshing;
+				  navigator.serviceWorker.addEventListener('controllerchange', function () {
+					if (refreshing) return;
+					window.location.reload();
+					refreshing = true;
+				  });
+				}
+			  </script>
 
 	</body>
 </html>
